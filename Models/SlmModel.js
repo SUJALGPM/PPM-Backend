@@ -38,7 +38,7 @@ const SlmSchema = mongoose.Schema({
 });
 
 
-const slmModel = mongoose.Model("Slm", SlmSchema);
+const slmModel = mongoose.model("Slm", SlmSchema);
 
 
 module.exports = slmModel;

@@ -44,37 +44,37 @@ const FlmSchema = mongoose.Schema({
         ppmStatus: String
     }],
     ppmFeedback: [{
-        planMode:String,
-        plannedDate:String,
-        plannedSpkName:String,
-        accPPMDate:String,
-        accSpkName:String,
-        scCode:String,
-        doctorSpec:String,
-        place:String,
-        noOfAttedance:String,
-        venueName:String,
-        brandName:String,
-        topic:String,
-        highlight:String,
-        totalExpenses:String,
-        advanceReceive:String,
-        addAmount:String,
-        expensesWithoutBills:String,
-        expensesWithBills:[{
-            desc:String,
-            billNo:String,
-            billDate:String,
-            amount:String,
-            expenseFile:String
+        planMode: String,
+        plannedDate: String,
+        plannedSpkName: String,
+        accPPMDate: String,
+        accSpkName: String,
+        scCode: String,
+        doctorSpec: String,
+        place: String,
+        noOfAttedance: String,
+        venueName: String,
+        brandName: String,
+        topic: String,
+        highlight: String,
+        totalExpenses: String,
+        advanceReceive: String,
+        addAmount: String,
+        expensesWithoutBills: String,
+        expensesWithBills: [{
+            desc: String,
+            billNo: String,
+            billDate: String,
+            amount: String,
+            expenseFile: String
         }],
-        attedanceList:[{
-            name:String,
-            scCode:String,
-            speciality:String
+        attedanceList: [{
+            name: String,
+            scCode: String,
+            speciality: String
         }],
-        eventPhotos:[{
-            fileName:String
+        eventPhotos: [{
+            fileName: String
         }]
     }],
     DateOfCreation: {
@@ -90,7 +90,7 @@ const FlmSchema = mongoose.Schema({
 });
 
 
-const flmModel = mongoose.Model("Flm", FlmSchema);
+const flmModel = mongoose.model("Flm", FlmSchema);
 
 
 module.exports = flmModel;

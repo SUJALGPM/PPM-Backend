@@ -38,7 +38,7 @@ const TlmSchema = mongoose.Schema({
 });
 
 
-const tlmModel = mongoose.Model("Tlm", TlmSchema);
+const tlmModel = mongoose.model("Tlm", TlmSchema);
 
 
 module.exports = tlmModel;
