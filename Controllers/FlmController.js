@@ -48,7 +48,6 @@ const flmRegister = async (req, res) => {
     }
 }
 
-
 //Login Controller....
 const flmLogin = async (req, res) => {
     try {
@@ -84,9 +83,57 @@ const flmLogin = async (req, res) => {
     }
 }
 
+//Create Planned....
+const createPlan = async (req, res) => {
+    try {
+        const flmId = req.params.id;
+        const { ppmDate, speakerName, scCode, doctorSpec, place, noOfAttedance, venueName, brandName, hotelReqSendDate, paymentMode, advanceReqDate, ppmCost, plannedTrack } = req.body;
+
+
+        //Check flm exist or not...
+        const flmExist = await flmModel.findById(flmId);
+        if (!flmExist) {
+            return res.status(501).send({ message: "Flm not found..!!", success: false });
+        }
+
+        //Configure planned status track saved || submit....
+        if (plannedTrack === true) {
+            const saved = true
+        } else {
+            const submit = false
+        }
+
+        //Formated planned data...
+        const formatedData = {
+            ppmDate: ppmDate,
+            speakerName: speakerName,
+            scCode: scCode,
+            doctorSpec: doctorSpec,
+            place: place,
+            noOfAttedance: noOfAttedance,
+            venueName: venueName,
+            brandName: brandName,
+            hotelReqSendDate: hotelReqSendDate,
+            paymentMode: paymentMode,
+            advanceReqDate: advanceReqDate,
+            ppmCost: ppmCost,
+            plannedTrack: plannedTrack
+        }
+
+
+
+    } catch (err) {
+        console.log(err);
+        res.status(501).send({ message: "Failed to create plan...!!", success: false });
+    }
+}
+
+
+
 
 
 module.exports = {
     flmRegister,
-    flmLogin
+    flmLogin,
+    createPlan
 }
