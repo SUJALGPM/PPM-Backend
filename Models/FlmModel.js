@@ -39,10 +39,14 @@ const FlmSchema = mongoose.Schema({
         paymentMode: String,
         advanceReqDate: String,
         ppmCost: String,
-        saved: Boolean,
-        submit: Boolean,
-        ppmStatus: String
+        ppmStatus: Boolean,
+        ppmPlanStatus: {
+            type: String,
+            default: 'Awaited'
+        },
+        ppmModifiedDate: String
     }],
+    ppmState: [],
     ppmFeedback: [{
         planMode: String,
         plannedDate: String,
@@ -84,7 +88,7 @@ const FlmSchema = mongoose.Schema({
             const day = currentDate.getDate().toString().padStart(2, '0');
             const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
             const year = currentDate.getFullYear();
-            return `${day}/${month}/${year}`;
+            return `${day}-${month}-${year}`;
         }
     },
 });
