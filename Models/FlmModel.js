@@ -26,6 +26,22 @@ const FlmSchema = mongoose.Schema({
         type: String,
         required: false
     },
+    HQ: {
+        type: String,
+        required: false
+    },
+    area: {
+        type: String,
+        required: false
+    },
+    region: {
+        type: String,
+        required: false
+    },
+    zone: {
+        type: String,
+        required: false
+    },
     ppmPlanning: [{
         ppmDate: String,
         speakerName: String,
@@ -44,7 +60,17 @@ const FlmSchema = mongoose.Schema({
             type: String,
             default: 'Awaited'
         },
-        ppmModifiedDate: String
+        ppmModifiedDate: String,
+        DateOfCreation: {
+            type: String,
+            default: () => {
+                const currentDate = new Date();
+                const day = currentDate.getDate().toString().padStart(2, '0');
+                const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+                const year = currentDate.getFullYear();
+                return `${day}-${month}-${year}`;
+            }
+        },
     }],
     ppmState: [],
     ppmFeedback: [{
@@ -79,7 +105,18 @@ const FlmSchema = mongoose.Schema({
         }],
         eventPhotos: [{
             fileName: String
-        }]
+        }],
+        DateOfCreation: {
+            type: String,
+            default: () => {
+                const currentDate = new Date();
+                const day = currentDate.getDate().toString().padStart(2, '0');
+                const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+                const year = currentDate.getFullYear();
+                return `${day}-${month}-${year}`;
+            }
+        },
+        ppmModifiedDate: String,
     }],
     DateOfCreation: {
         type: String,

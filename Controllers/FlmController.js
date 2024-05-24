@@ -5,6 +5,7 @@ const cron = require("node-cron");
 const moment = require("moment");
 
 
+
 //Register Controller....
 const flmRegister = async (req, res) => {
     try {
@@ -16,7 +17,7 @@ const flmRegister = async (req, res) => {
         }
 
         //Handle new tlm data...
-        const { flmID, flmNAME, flmPASSWORD, flmGENDER, flmNUMBER } = req.body;
+        const { flmID, flmNAME, flmPASSWORD, flmGENDER, flmNUMBER, HQ, area, region, zone } = req.body;
 
         //Check flm exist or not...
         const flmExist = await flmModel.findOne({ flmId: flmID });
@@ -31,6 +32,10 @@ const flmRegister = async (req, res) => {
             flmPassword: flmPASSWORD,
             flmGender: flmGENDER,
             flmNumber: flmNUMBER,
+            HQ: HQ,
+            area: area,
+            region: region,
+            zone: zone
         }
 
         //Save new flm entry in database....
@@ -48,7 +53,6 @@ const flmRegister = async (req, res) => {
         res.status(501).send({ message: "Failed to register new tlm...!!", success: false });
     }
 }
-
 
 //Login Controller....
 const flmLogin = async (req, res) => {
@@ -84,7 +88,6 @@ const flmLogin = async (req, res) => {
         res.status(501).send({ message: "Failed to login slm...!!!", success: false });
     }
 }
-
 
 //Create Planned....
 const createPlan = async (req, res) => {
@@ -136,7 +139,6 @@ const createPlan = async (req, res) => {
         res.status(501).send({ message: "Failed to create plan...!!", success: false });
     }
 }
-
 
 //Update already created ppmPlanning plan...
 const updatePlan = async (req, res) => {
@@ -190,7 +192,6 @@ const updatePlan = async (req, res) => {
     }
 }
 
-
 //Delete planned....
 const deletePlan = async (req, res) => {
     try {
@@ -222,7 +223,6 @@ const deletePlan = async (req, res) => {
         res.status(501).send({ message: "Failed to delete ppm plan..!!", success: false });
     }
 }
-
 
 //After certain date PPM plan moved from ppmPlanning -----> ppmState...
 const planMigration = async () => {
@@ -256,9 +256,8 @@ const planMigration = async () => {
         console.error("Error moving plans:", err);
     }
 };
-// Schedule the job to run every 10 seconds
+// Schedule the job to run every 20 seconds
 cron.schedule("*/20 * * * * *", planMigration);
-
 
 //Update ppmState plan....
 const updateStatePlan = async (req, res) => {
@@ -329,7 +328,208 @@ const updateStatePlan = async (req, res) => {
     }
 }
 
+//Get plan details(ppmPlanning)....
+const planDetail = async (req, res) => {
+    try {
+        const flmId = req.params.flmId;
 
+        //Check flm exist or not....
+        const flmExist = await flmModel.findById(flmId);
+        if (!flmExist) {
+            return res.status(404).send({ message: "Flm not found..!!", success: false });
+        }
+
+        //Loop data to store....
+        const planReportDetail = [];
+
+        //Iterate plan detail....
+        for (plan of flmExist.ppmPlanning) {
+            const data = {
+                PPMDATE: plan.ppmDate,
+                PPMSPK: plan.speakerName,
+                PPMSCODE: plan.scCode,
+                PPMSPEC: plan.doctorSpec,
+                PPMPLACE: plan.place,
+                PPMATTEDANCE: plan.noOfAttedance,
+                PPMVNAME: plan.venueName,
+                PPMBNAME: plan.brandName,
+                PPMHOTELREQDATE: plan.hotelReqSendDate,
+                PPMPMODE: plan.paymentMode,
+                PPMADVREQDATE: plan.advanceReqDate,
+                PPMCOST: plan.ppmCost,
+                PPMSTATUS: plan.ppmStatus ? 'submit' : 'saved',
+                PPMPLANSTATUS: plan.ppmPlanStatus,
+                PPMMDFDATE: plan.ppmModifiedDate,
+            }
+            planReportDetail.push(data);
+        }
+
+        res.status(201).json(planReportDetail);
+    } catch (err) {
+        console.log(err);
+        res.status(501).send({ message: "Failed to fetch plan details..!!!", success: false });
+    }
+}
+
+//Create Feedback...
+// const createFeedback = async (req, res) => {
+//     try {
+//         const flmId = req.params.id;
+//         const { planMode, plannedDate, plannedSpkName, accPPMDate, accSpkName, scCode, doctorSpec, place, noOfAttedance, venueName, brandName, topic, highlight, totalExpenses, advanceReceive, addAmount, expensesWithoutBills, desc, billNo, billDate, amount } = req.body;
+
+//         //Check flm exist or not...
+//         const flmExist = await flmModel.findById(flmId);
+//         if (!flmExist) {
+//             return res.status(404).send({ message: "Flm not found..!!", success: false });
+//         }
+
+//         // Parse expenses with bills...
+//         let expensesWithBills = [];
+//         if (Array.isArray(req.files) && req.files.length > 0) {
+//             expensesWithBills = req.files.filter(file => file.fieldname === 'expenseFiles').map((file, index) => ({
+//                 desc: req.body[`desc_${index}`],
+//                 billNo: req.body[`billNo_${index}`],
+//                 billDate: req.body[`billDate_${index}`],
+//                 amount: req.body[`amount_${index}`],
+//                 expenseFile: file.path
+//             }));
+//         }
+
+//         // Parse attendance list....
+//         // const attedanceList = [];
+//         // if (Array.isArray(req.body.attendance)) {
+//         //     req.body.attendance.forEach((attendance, index) => {
+//         //         attedanceList.push({
+//         //             name: attendance[`name_${index}`],
+//         //             scCode: attendance[`scCode_${index}`],
+//         //             speciality: attendance[`speciality_${index}`]
+//         //         });
+//         //     });
+//         // } else {
+//         //     attedanceList.push({
+//         //         name: req.body.attendance.name,
+//         //         scCode: req.body.attendance.scCode,
+//         //         speciality: req.body.attendance.speciality
+//         //     });
+//         // }
+
+//         // Parse attendance list....
+//         const attedanceList = [];
+//         if (Array.isArray(req.body.attendance)) {
+//             req.body.attendance.forEach((attendance, index) => {
+//                 attedanceList.push({
+//                     name: attendance[`name_${index}`],
+//                     scCode: attendance[`scCode_${index}`],
+//                     speciality: attendance[`speciality_${index}`]
+//                 });
+//             });
+//         } else {
+//             attedanceList.push({
+//                 name: req.body.attendance.name,
+//                 scCode: req.body.attendance.scCode,
+//                 speciality: req.body.attendance.speciality
+//             });
+//         }
+
+//         // Parse event photos....
+//         // const eventPhotos = req.files.filter(file => file.fieldname === 'eventPhotos').map(file => ({
+//         //     fileName: file.path
+//         // }));
+
+//         // Parse event photos
+//         let eventPhotos = [];
+//         if (req.files && Array.isArray(req.files)) {
+//             eventPhotos = req.files.filter(file => file.fieldname === 'eventPhotos').map(file => ({
+//                 fileName: file.path
+//             }));
+//         }
+
+
+//         //Formated data of feedback....
+//         const formatedData = {
+//             planMode,
+//             plannedDate,
+//             plannedSpkName,
+//             accPPMDate,
+//             accSpkName,
+//             scCode,
+//             doctorSpec,
+//             place,
+//             noOfAttedance,
+//             venueName,
+//             brandName,
+//             topic,
+//             highlight,
+//             totalExpenses,
+//             advanceReceive,
+//             addAmount,
+//             expensesWithoutBills,
+//             expensesWithBills,
+//             attedanceList,
+//             eventPhotos
+//         }
+
+//         flmExist.ppmFeedback.push(formatedData);
+//         await flmExist.save();
+
+//         res.status(201).send({ message: "New Feedback created successfully...", success: true });
+//     } catch (err) {
+//         console.log(err);
+//         res.status(501).send({ message: "Failed to create new feedback..!!", success: false });
+//     }
+// }
+
+const createFeedback = async (req, res) => {
+    try {
+        const flmId = req.params.id;
+        const { planMode, plannedDate, plannedSpkName, accPPMDate, accSpkName, scCode, doctorSpec, place, noOfAttedance, venueName, brandName, topic, highlight, totalExpenses, advanceReceive, addAmount, expensesWithoutBills, desc, billNo, billDate, amount } = req.body;
+
+        //Check flm exist or not...
+        const flmExist = await flmModel.findById(flmId);
+        if (!flmExist) {
+            return res.status(404).send({ message: "Flm not found..!!", success: false });
+        }
+
+        // Parse event photos....
+        const eventPhotos = req.files.filter(file => file.fieldname === 'eventPhotos').map(file => ({
+            fileName: file.path
+        }));
+
+
+
+        //Formated data of feedback....
+        const formatedData = {
+            planMode,
+            plannedDate,
+            plannedSpkName,
+            accPPMDate,
+            accSpkName,
+            scCode,
+            doctorSpec,
+            place,
+            noOfAttedance,
+            venueName,
+            brandName,
+            topic,
+            highlight,
+            totalExpenses,
+            advanceReceive,
+            addAmount,
+            expensesWithoutBills,
+            expensesWithBills,
+            attedanceList,
+            eventPhotos
+        }
+
+        flmExist.ppmFeedback.push(formatedData);
+        await flmExist.save();
+
+        res.status(201).send({ message: "New Feedback created successfully...", success: true });
+    } catch (err) {
+        console.log(err);
+        res.status(501).send({ message: "Failed to create new feedback..!!", success: false });
+    }
+}
 
 
 
@@ -340,5 +540,7 @@ module.exports = {
     createPlan,
     updatePlan,
     deletePlan,
-    updateStatePlan
+    updateStatePlan,
+    planDetail,
+    createFeedback
 }
